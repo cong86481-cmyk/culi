@@ -377,10 +377,10 @@ async function main() {
         status: 'ACTIVE',
         items: {
           create: box.items.map((item) => ({
-            name: item.name,
+            description: item.name,
+            type: item.type,
             rarity: item.rarity,
             dropRate: item.dropRate,
-            type: item.type,
             value: item.value,
             minQuantity: item.minQuantity || 1,
             maxQuantity: item.maxQuantity || 1,
