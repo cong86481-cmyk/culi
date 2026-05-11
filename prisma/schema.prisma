@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
+  password      String
+  role          String    @default("CUSTOMER")
+  balance       Float     @default(0)
+  transferNote  String?   @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deposits      Deposit[]
+  purchases     Purchase[]
+  transactions  Transaction[]
+  mysteryBoxOpenings MysteryBoxOpening[]
+}
+
+model Account {
+  id              String    @id @default(cuid())
+  title           String
+  price           Float
+  rank            String
+  vipLevel        Int       @default(0)
+  vipGuns         Int       @default(0)
+  legendaryGuns   Int       @default(0)
+  skins           Int       @default(0)
+  characters      String    @default("[]")
+  backpack        String    @default("[]")
+  description     String
+  thumbnail       String?
+  images          String    @default("[]")
+  username        String
+  password        String
+  status          String    @default("AVAILABLE")
+  featured        Boolean   @default(false)
+  soldCount       Int       @default(0)
+  categoryId      String?
+  category        Category? @relation(fields: [categoryId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  purchases       Purchase[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  accounts Account[]
+}
+
+model Deposit {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  amount       Float
+  method       String
+  transferNote String
+  status       String   @default("PENDING")
+  createdAt    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Purchase {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id])
+  price     Float
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String
+  amount      Float
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model MysteryBox {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  price       Float
+  discount    Float    @default(0)
+  stock       Int      @default(-1)
+  status      String   @default("ACTIVE")
+  items       MysteryBoxItem[]
+  openings    MysteryBoxOpening[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MysteryBoxItem {
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  image          String?
+  type           String
+  rarity         String
+  dropRate       Float
+  minQuantity    Int            @default(1)
+  maxQuantity    Int            @default(1)
+  value          Float          @default(0)
+  boxId          String
+  box            MysteryBox     @relation(fields: [boxId], references: [id], onDelete: Cascade)
+  openings       MysteryBoxOpening[]
+  createdAt      DateTime       @default(now())
+}
+
+model MysteryBoxOpening {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+  boxId       String
+  box         MysteryBox     @relation(fields: [boxId], references: [id])
+  itemId      String?
+  item        MysteryBoxItem? @relation(fields: [itemId], references: [id])
+  mysteryBoxAccountId String?
+  mysteryBoxAccount    MysteryBoxAccount? @relation(fields: [mysteryBoxAccountId], references: [id])
+  price       Float
+  createdAt   DateTime       @default(now())
+}
+
+model MysteryBoxAccount {
+  id              String   @id @default(cuid())
+  name            String
+  rarity          String   @default("EPIC")
+  username        String
+  password        String
+  rank            String   @default("")
+  vipLevel        Int      @default(0)
+  vipGuns         Int      @default(0)
+  legendaryGuns   Int      @default(0)
+  description     String   @default("")
+  status          String   @default("AVAILABLE")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  openings        MysteryBoxOpening[]
+}
