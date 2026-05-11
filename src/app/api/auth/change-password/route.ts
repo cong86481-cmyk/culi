@@ -5,8 +5,8 @@ import { getCurrentUser } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
+    const currentUser = await getCurrentUser()
+    if (!currentUser) {
       return NextResponse.json(
         { success: false, error: 'Vui lòng đăng nhập' },
         { status: 401 }
@@ -34,6 +34,19 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { success: false, error: 'Mật khẩu mới phải có ít nhất 6 ký tự' },
         { status: 400 }
+      )
+    }
+
+    // Fetch user with password from Prisma directly
+    const user = await prisma.user.findUnique({
+      where: { id: currentUser.id },
+      select: { id: true, password: true },
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Không tìm thấy người dùng' },
+        { status: 404 }
       )
     }
 

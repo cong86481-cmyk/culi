@@ -32,6 +32,7 @@ async function main() {
   console.log('🎮 Adding 20 new accounts...')
 
   const categories = await prisma.category.findMany()
+  const categoryArray = Array.isArray(categories) ? categories : []
 
   const newAccounts = Array.from({ length: 20 }, (_, i) => {
     const rank = randomItem(ranks)
@@ -41,7 +42,7 @@ async function main() {
     const skins = Math.floor(Math.random() * 80) + 5
     const charCount = Math.floor(Math.random() * 5) + 1
     const weaponCount = Math.floor(Math.random() * 4) + 1
-    const category = randomItem(categories)
+    const category = categoryArray.length > 0 ? categoryArray[Math.floor(Math.random() * categoryArray.length)] : null
 
     return {
       title: `Account VIP ${vipLevel} - Rank ${rank} - ${legendaryGuns} Vũ Khí Huyền Thoại`,
@@ -59,7 +60,7 @@ async function main() {
       username: `acc${Date.now()}_${i}`,
       password: `Pass${Math.random().toString(36).substring(2, 8)}!`,
       featured: Math.random() > 0.8,
-      categoryId: category.id,
+      categoryId: category?.id ?? null,
       status: 'AVAILABLE',
     }
   })

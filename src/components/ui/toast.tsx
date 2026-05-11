@@ -26,7 +26,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [exitingIds, setExitingIds] = useState<Set<string>>(new Set())
 
   const removeToast = useCallback((id: string) => {
-    setExitingIds(prev => new Set([...prev, id]))
+    setExitingIds(prev => new Set([...Array.from(prev), id]))
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id))
       setExitingIds(prev => {

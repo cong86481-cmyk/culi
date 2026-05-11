@@ -58,7 +58,12 @@ export function Header() {
     fetchUser()
   }, [pathname])
 
-  const navLinks = [
+  const navLinks: Array<{
+    href: string
+    label: string
+    icon: typeof Home
+    highlight?: boolean
+  }> = [
     { href: '/', label: 'Trang chủ', icon: Home },
     { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
     { href: '/wallet', label: 'Nạp tiền', icon: Wallet },

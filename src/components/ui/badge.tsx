@@ -63,6 +63,21 @@ export function Badge({
 }
 
 // Status Badge specific component for convenience
+interface StatusConfig {
+  variant: 'primary' | 'success' | 'warning' | 'error' | 'secondary' | 'info'
+  label: string
+  dot: boolean
+  pulse?: boolean
+}
+
+const statusConfig: Record<string, StatusConfig> = {
+  AVAILABLE: { variant: 'success' as const, label: 'Còn hàng', dot: true },
+  SOLD: { variant: 'error' as const, label: 'Đã bán', dot: true },
+  PENDING: { variant: 'warning' as const, label: 'Chờ xử lý', dot: true, pulse: true },
+  APPROVED: { variant: 'success' as const, label: 'Đã duyệt', dot: true },
+  REJECTED: { variant: 'error' as const, label: 'Từ chối', dot: true },
+}
+
 export function StatusBadge({
   status,
   size = 'sm',
@@ -70,19 +85,11 @@ export function StatusBadge({
   status: 'AVAILABLE' | 'SOLD' | 'PENDING' | 'APPROVED' | 'REJECTED'
   size?: 'sm' | 'md' | 'lg'
 }) {
-  const config = {
-    AVAILABLE: { variant: 'success' as const, label: 'Còn hàng', dot: true },
-    SOLD: { variant: 'error' as const, label: 'Đã bán', dot: true },
-    PENDING: { variant: 'warning' as const, label: 'Chờ xử lý', dot: true, pulse: true },
-    APPROVED: { variant: 'success' as const, label: 'Đã duyệt', dot: true },
-    REJECTED: { variant: 'error' as const, label: 'Từ chối', dot: true },
-  }
-
-  const { variant, label, dot, pulse } = config[status]
+  const config = statusConfig[status]
 
   return (
-    <Badge variant={variant} size={size} dot={dot} pulse={pulse}>
-      {label}
+    <Badge variant={config.variant} size={size} dot={config.dot} pulse={config.pulse}>
+      {config.label}
     </Badge>
   )
 }

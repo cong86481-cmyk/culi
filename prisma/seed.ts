@@ -344,7 +344,25 @@ async function main() {
   console.log('✅ Created sample deposits')
 
   // Create Mystery Box - Single 399K box
-  const mysteryBoxes = [
+  interface MysteryBoxItem {
+    name: string
+    type: string
+    rarity: string
+    dropRate: number
+    value: number
+    minQuantity?: number
+    maxQuantity?: number
+  }
+
+  const mysteryBoxes: Array<{
+    name: string
+    slug: string
+    description: string
+    price: number
+    discount: number
+    stock: number
+    items: MysteryBoxItem[]
+  }> = [
     {
       name: 'Túi Mù 399K',
       slug: 'tui-mu-399k',
@@ -377,6 +395,7 @@ async function main() {
         status: 'ACTIVE',
         items: {
           create: box.items.map((item) => ({
+            name: item.name,
             description: item.name,
             type: item.type,
             rarity: item.rarity,
