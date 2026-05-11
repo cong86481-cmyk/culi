@@ -1,6 +1,8 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ShoppingBag, Crown, Users, Star } from 'lucide-react'
-import { prisma } from '@/lib/prisma'
+import { ArrowRight, ShoppingBag, Star } from 'lucide-react'
 import { AccountCard } from '@/components/marketplace/account-card'
 import { BannerCarousel } from '@/components/layout/banner-carousel'
 import { AnimatedStats } from '@/components/ui/animated-stats'
@@ -8,54 +10,67 @@ import { FloatingParticles } from '@/components/ui/floating-particles'
 import { FeaturesSection } from '@/components/home/features-section'
 import { CTASection } from '@/components/home/cta-section'
 
-export const dynamic = 'force-dynamic'
-
-async function getHomeData() {
-  const [featuredAccounts, latestAccounts, stats] = await Promise.all([
-    prisma.account.findMany({
-      where: { status: 'AVAILABLE', featured: true },
-      take: 4,
-      orderBy: { createdAt: 'desc' },
-    }),
-    prisma.account.findMany({
-      where: { status: 'AVAILABLE' },
-      take: 8,
-      orderBy: { createdAt: 'desc' },
-    }),
-    Promise.all([
-      prisma.account.count({ where: { status: 'AVAILABLE' } }),
-      prisma.account.count({ where: { status: 'SOLD' } }),
-      prisma.user.count(),
-      prisma.purchase.count(),
-    ]),
-  ])
-
-  return {
-    featuredAccounts,
-    latestAccounts,
-    stats: {
-      availableAccounts: stats[0],
-      soldAccounts: stats[1],
-      totalUsers: stats[2],
-      totalPurchases: stats[3],
-    },
-  }
+interface Account {
+  id: string
+  title: string
+  price: number
+  rank: string
+  thumbnail?: string
+  images: string[]
+  characters: string[]
+  backpack: string[]
+  vipLevel: number
+  vipGuns: number
+  legendaryGuns: number
+  skins: number
+  featured: boolean
+  status: string
 }
 
-export default async function HomePage() {
-  const { featuredAccounts, latestAccounts, stats } = await getHomeData()
+interface Stats {
+  availableAccounts: number
+  soldAccounts: number
+  totalUsers: number
+  totalPurchases: number
+}
+
+export default function HomePage() {
+  const [featuredAccounts, setFeaturedAccounts] = useState<Account[]>([])
+  const [latestAccounts, setLatestAccounts] = useState<Account[]>([])
+  const [stats, setStats] = useState<Stats>({
+    availableAccounts: 0,
+    soldAccounts: 0,
+    totalUsers: 0,
+    totalPurchases: 0,
+  })
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [accountsRes, bannersRes] = await Promise.all([
+          fetch('/api/accounts?pageSize=8'),
+          fetch('/api/banners'),
+        ])
+        
+        const accountsData = await accountsRes.json()
+        if (accountsData.success) {
+          setFeaturedAccounts(accountsData.data.items.filter((a: Account) => a.featured).slice(0, 4))
+          setLatestAccounts(accountsData.data.items.slice(0, 8))
+        }
+      } catch (error) {
+        console.error('Failed to fetch home data:', error)
+      }
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: '#0A0A0F' }}>
-      {/* Floating Particles Background */}
       <FloatingParticles />
 
-      {/* Banner Carousel */}
       <BannerCarousel />
 
-      {/* Stats Section with Animation */}
       <section className="py-16 relative overflow-hidden">
-        {/* Glow Effect */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-20" 
           style={{ background: 'radial-gradient(circle, rgba(255,107,0,0.3) 0%, transparent 70%)' }} />
         
@@ -64,7 +79,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Accounts */}
       {featuredAccounts.length > 0 && (
         <section className="py-16 relative">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FF6B00]/5 to-transparent" />
@@ -92,12 +106,7 @@ export default async function HomePage() {
               {featuredAccounts.map((account, index) => (
                 <AccountCard
                   key={account.id}
-                  account={{
-                    ...account,
-                    characters: JSON.parse(account.characters),
-                    backpack: JSON.parse(account.backpack),
-                    images: JSON.parse(account.images),
-                  }}
+                  account={account}
                   index={index}
                   featured
                 />
@@ -112,10 +121,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Features Section */}
       <FeaturesSection />
 
-      {/* Latest Accounts */}
       <section className="py-16 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#FF6B00]/5" />
         <div className="relative container mx-auto px-4">
@@ -138,12 +145,7 @@ export default async function HomePage() {
             {latestAccounts.map((account, index) => (
               <AccountCard
                 key={account.id}
-                account={{
-                  ...account,
-                  characters: JSON.parse(account.characters),
-                  backpack: JSON.parse(account.backpack),
-                  images: JSON.parse(account.images),
-                }}
+                account={account}
                 index={index}
               />
             ))}
@@ -158,7 +160,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <CTASection />
     </div>
   )
