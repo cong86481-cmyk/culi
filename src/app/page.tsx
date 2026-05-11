@@ -8,6 +8,8 @@ import { FloatingParticles } from '@/components/ui/floating-particles'
 import { FeaturesSection } from '@/components/home/features-section'
 import { CTASection } from '@/components/home/cta-section'
 
+export const dynamic = 'force-dynamic'
+
 async function getHomeData() {
   const [featuredAccounts, latestAccounts, stats] = await Promise.all([
     prisma.account.findMany({
