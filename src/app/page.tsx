@@ -9,23 +9,7 @@ import { AnimatedStats } from '@/components/ui/animated-stats'
 import { FloatingParticles } from '@/components/ui/floating-particles'
 import { FeaturesSection } from '@/components/home/features-section'
 import { CTASection } from '@/components/home/cta-section'
-
-interface Account {
-  id: string
-  title: string
-  price: number
-  rank: string
-  thumbnail?: string
-  images: string[]
-  characters: string[]
-  backpack: string[]
-  vipLevel: number
-  vipGuns: number
-  legendaryGuns: number
-  skins: number
-  featured: boolean
-  status: string
-}
+import type { Account } from '@/types'
 
 interface Stats {
   availableAccounts: number
