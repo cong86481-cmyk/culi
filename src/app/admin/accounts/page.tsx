@@ -386,11 +386,13 @@ export default function AdminAccountsPage() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Tiêu đề"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            <Select
+              label="Danh mục"
+              options={categories.map(c => ({ value: c.id, label: c.name }))}
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
               required
+              placeholder="Chọn danh mục"
             />
             <Input
               label="Giá (VNĐ)"
