@@ -31,15 +31,21 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [accountsRes, bannersRes] = await Promise.all([
+        const [accountsRes, bannersRes, statsRes] = await Promise.all([
           fetch('/api/accounts?pageSize=8'),
           fetch('/api/banners'),
+          fetch('/api/stats'),
         ])
         
         const accountsData = await accountsRes.json()
         if (accountsData.success) {
           setFeaturedAccounts(accountsData.data.items.filter((a: Account) => a.featured).slice(0, 4))
           setLatestAccounts(accountsData.data.items.slice(0, 8))
+        }
+
+        const statsData = await statsRes.json()
+        if (statsData.success) {
+          setStats(statsData.data)
         }
       } catch (error) {
         console.error('Failed to fetch home data:', error)
