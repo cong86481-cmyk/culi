@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface ModalProps {
   isOpen: boolean
@@ -29,55 +29,23 @@ export function Modal({
   closeOnEscape = true,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-  const previousActiveElement = useRef<HTMLElement | null>(null)
-
-  const handleEscape = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape' && closeOnEscape) {
-      onClose()
-    }
-  }, [onClose, closeOnEscape])
-
-  const trapFocus = useCallback((e: KeyboardEvent) => {
-    if (e.key !== 'Tab' || !modalRef.current) return
-
-    const focusableElements = modalRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    const firstElement = focusableElements[0] as HTMLElement
-    const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
-
-    if (e.shiftKey && document.activeElement === firstElement) {
-      e.preventDefault()
-      lastElement?.focus()
-    } else if (!e.shiftKey && document.activeElement === lastElement) {
-      e.preventDefault()
-      firstElement?.focus()
-    }
-  }, [])
 
   useEffect(() => {
-    if (isOpen) {
-      previousActiveElement.current = document.activeElement as HTMLElement
+    if (isOpen && closeOnEscape) {
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose()
+        }
+      }
       document.addEventListener('keydown', handleEscape)
-      document.addEventListener('keydown', trapFocus)
       document.body.style.overflow = 'hidden'
-
-      // Focus first focusable element
-      setTimeout(() => {
-        const firstFocusable = modalRef.current?.querySelector(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        ) as HTMLElement
-        firstFocusable?.focus()
-      }, 100)
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape)
+        document.body.style.overflow = 'unset'
+      }
     }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.removeEventListener('keydown', trapFocus)
-      document.body.style.overflow = 'unset'
-      previousActiveElement.current?.focus()
-    }
-  }, [isOpen, handleEscape, trapFocus])
+  }, [isOpen, onClose, closeOnEscape])
 
   const sizes = {
     sm: 'max-w-md',

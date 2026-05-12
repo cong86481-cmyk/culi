@@ -33,6 +33,9 @@ export default function AdminAccountsPage() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [showVipLevel, setShowVipLevel] = useState(false)
+  const [showVipGuns, setShowVipGuns] = useState(false)
+  const [showSkins, setShowSkins] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -94,10 +97,10 @@ export default function AdminAccountsPage() {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          vipLevel: parseInt(formData.vipLevel),
-          vipGuns: parseInt(formData.vipGuns),
-          legendaryGuns: parseInt(formData.legendaryGuns),
-          skins: parseInt(formData.skins),
+          vipLevel: formData.vipLevel ? parseInt(formData.vipLevel) : 0,
+          vipGuns: formData.vipGuns ? parseInt(formData.vipGuns) : 0,
+          legendaryGuns: formData.legendaryGuns ? parseInt(formData.legendaryGuns) : 0,
+          skins: formData.skins ? parseInt(formData.skins) : 0,
           characters: formData.characters.split('\n').filter(Boolean),
           backpack: formData.backpack.split('\n').filter(Boolean),
           images: formData.images.split('\n').filter(Boolean),
@@ -127,10 +130,10 @@ export default function AdminAccountsPage() {
       title: account.title,
       price: account.price.toString(),
       rank: account.rank,
-      vipLevel: account.vipLevel.toString(),
-      vipGuns: account.vipGuns.toString(),
+      vipLevel: account.vipLevel > 0 ? account.vipLevel.toString() : '',
+      vipGuns: account.vipGuns > 0 ? account.vipGuns.toString() : '',
       legendaryGuns: account.legendaryGuns.toString(),
-      skins: account.skins.toString(),
+      skins: account.skins > 0 ? account.skins.toString() : '',
       characters: Array.isArray(account.characters) ? account.characters.join('\n') : '',
       backpack: Array.isArray(account.backpack) ? account.backpack.join('\n') : '',
       description: account.description,
@@ -141,6 +144,9 @@ export default function AdminAccountsPage() {
       featured: account.featured,
       categoryId: account.categoryId || '',
     })
+    setShowVipLevel(account.vipLevel > 0)
+    setShowVipGuns(account.vipGuns > 0)
+    setShowSkins(account.skins > 0)
     setShowModal(true)
   }
 
@@ -192,10 +198,10 @@ export default function AdminAccountsPage() {
       title: '',
       price: '',
       rank: '',
-      vipLevel: '0',
-      vipGuns: '0',
+      vipLevel: '',
+      vipGuns: '',
       legendaryGuns: '0',
-      skins: '0',
+      skins: '',
       characters: '',
       backpack: '',
       description: '',
@@ -206,12 +212,17 @@ export default function AdminAccountsPage() {
       featured: false,
       categoryId: '',
     })
+    setShowVipLevel(false)
+    setShowVipGuns(false)
+    setShowSkins(false)
   }
 
   const ranks = [
-    'Đồng', 'Bạc', 'Vàng', 'Bạch Kim', 'Kim Cương',
-    'Cao Thủ', 'Chiến Thần', 'Thách Đấu'
+    'Đồng', 'Bạc', 'Vàng', 'Bạch kim', 'Kim cương',
+    'Vua Súng', 'Thần súng', 'Huyền Thoại', 'Thần Thoại', 'Truyền kì 3k7+'
   ]
+
+  const ranksForSelect = ranks.map(r => ({ value: r, label: r }))
 
   return (
     <div className="pt-24 pb-16">
@@ -390,41 +401,103 @@ export default function AdminAccountsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
               label="Rank"
-              options={ranks.map(r => ({ value: r, label: r }))}
+              options={ranksForSelect}
               value={formData.rank}
               onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
               required
+              placeholder="Chọn rank"
             />
-            <Input
-              label="VIP Level"
-              type="number"
-              value={formData.vipLevel}
-              onChange={(e) => setFormData({ ...formData, vipLevel: e.target.value })}
-            />
-            <Input
-              label="VVIP Guns"
-              type="number"
-              value={formData.vipGuns}
-              onChange={(e) => setFormData({ ...formData, vipGuns: e.target.value })}
-            />
-            <Input
-              label="Legendary Guns"
-              type="number"
-              value={formData.legendaryGuns}
-              onChange={(e) => setFormData({ ...formData, legendaryGuns: e.target.value })}
-            />
+            {showVipLevel && (
+              <Input
+                label="Level"
+                type="number"
+                value={formData.vipLevel}
+                onChange={(e) => setFormData({ ...formData, vipLevel: e.target.value })}
+                placeholder="Nhập level"
+              />
+            )}
           </div>
 
-          <Input
-            label="Skins"
-            type="number"
-            value={formData.skins}
-            onChange={(e) => setFormData({ ...formData, skins: e.target.value })}
-            className="w-32"
-          />
+          {!showVipLevel && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowVipLevel(true)}
+              className="w-full md:w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Thêm Level
+            </Button>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {showVipGuns && (
+              <div className="relative">
+                <Input
+                  label="VIP Gun"
+                  type="number"
+                  value={formData.vipGuns}
+                  onChange={(e) => setFormData({ ...formData, vipGuns: e.target.value })}
+                  placeholder="Nhập số VIP Gun"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setShowVipGuns(false); setFormData({ ...formData, vipGuns: '' }); }}
+                  className="absolute top-0 right-0 mt-7 mr-1 text-text-muted hover:text-error text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+            {showSkins && (
+              <div className="relative">
+                <Input
+                  label="Skins"
+                  type="number"
+                  value={formData.skins}
+                  onChange={(e) => setFormData({ ...formData, skins: e.target.value })}
+                  placeholder="Nhập số skins"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setShowSkins(false); setFormData({ ...formData, skins: '' }); }}
+                  className="absolute top-0 right-0 mt-7 mr-1 text-text-muted hover:text-error text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+
+          {!showVipGuns && !showSkins && (
+            <div className="flex gap-2">
+              {!showVipGuns && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowVipGuns(true)}
+                  className="flex-1"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Thêm VIP Gun
+                </Button>
+              )}
+              {!showSkins && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowSkins(true)}
+                  className="flex-1"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Thêm Skins
+                </Button>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
