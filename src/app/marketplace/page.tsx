@@ -12,6 +12,7 @@ function MarketplaceContent() {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [filters, setFilters] = useState<FilterState>({
     search: '',
     category: '',
@@ -32,8 +33,8 @@ function MarketplaceContent() {
       const params = new URLSearchParams()
       params.set('page', page.toString())
       params.set('pageSize', '12')
+      if (selectedCategory) params.set('category', selectedCategory)
       if (filters.search) params.set('search', filters.search)
-      if (filters.category) params.set('category', filters.category)
       if (filters.rank) params.set('rank', filters.rank)
       if (filters.minPrice) params.set('minPrice', filters.minPrice)
       if (filters.maxPrice) params.set('maxPrice', filters.maxPrice)
@@ -54,7 +55,7 @@ function MarketplaceContent() {
     } finally {
       setLoading(false)
     }
-  }, [page, filters])
+  }, [page, selectedCategory, filters])
 
   const fetchCategories = async () => {
     try {
@@ -99,6 +100,35 @@ function MarketplaceContent() {
           Khám phá hàng trăm tài khoản CrossFire Legends chất lượng cao
         </p>
       </motion.div>
+
+      {/* Category Tabs */}
+      <div className="mb-8">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => { setSelectedCategory(''); setPage(1); }}
+            className={`px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
+              selectedCategory === ''
+                ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                : 'bg-surface hover:bg-surface/80 text-text-secondary hover:text-white'
+            }`}
+          >
+            Tất cả
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
+              className={`px-6 py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
+                selectedCategory === cat.id
+                  ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                  : 'bg-surface hover:bg-surface/80 text-text-secondary hover:text-white'
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="mb-8">
