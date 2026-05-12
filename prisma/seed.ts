@@ -320,6 +320,7 @@ async function main() {
     { key: 'minimum_deposit', value: '10000' },
     { key: 'contact_email', value: 'support@cfl-market.vn' },
     { key: 'contact_phone', value: '0901 234 567' },
+    { key: 'zalo_link', value: 'https://zalo.me/0812425559' },
   ]
 
   for (const setting of settings) {
