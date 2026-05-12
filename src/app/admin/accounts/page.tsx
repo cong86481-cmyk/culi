@@ -395,6 +395,12 @@ export default function AdminAccountsPage() {
               placeholder="Chọn danh mục"
             />
             <Input
+              label="Tiêu đề"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              required
+            />
+            <Input
               label="Giá (VNĐ)"
               type="number"
               value={formData.price}
