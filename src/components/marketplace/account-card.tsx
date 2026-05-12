@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Crown, Sword, Shirt, Star, Eye, Zap, Clock, TrendingUp } from 'lucide-react'
+import { Crown, Eye, Clock, TrendingUp } from 'lucide-react'
 import { formatPrice, formatRelativeTime } from '@/lib/utils'
 import type { Account } from '@/types'
 
@@ -152,44 +152,11 @@ export function AccountCard({ account, index = 0, featured = false }: AccountCar
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {account.vipGuns > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(255, 107, 0, 0.1)' }}>
-                  <Sword className="w-4 h-4 text-primary" />
-                  <div>
-                    <p className="text-xs text-[#71717A]">Vũ khí VVIP</p>
-                    <p className="font-semibold text-sm">{account.vipGuns} items</p>
-                  </div>
-                </div>
-              )}
-              {account.legendaryGuns > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(251, 191, 36, 0.1)' }}>
-                  <Star className="w-4 h-4" style={{ color: '#FBBF24' }} />
-                  <div>
-                    <p className="text-xs text-[#71717A]">Huyền thoại</p>
-                    <p className="font-semibold text-sm">{account.legendaryGuns} items</p>
-                  </div>
-                </div>
-              )}
-              {account.skins > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}>
-                  <Shirt className="w-4 h-4" style={{ color: '#A855F7' }} />
-                  <div>
-                    <p className="text-xs text-[#71717A]">Skin</p>
-                    <p className="font-semibold text-sm">{account.skins} items</p>
-                  </div>
-                </div>
-              )}
-              {account.characters?.length > 0 && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
-                  <Crown className="w-4 h-4" style={{ color: '#22C55E' }} />
-                  <div>
-                    <p className="text-xs text-[#71717A]">Nhân vật</p>
-                    <p className="font-semibold text-sm">{account.characters.length} chars</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            {account.description && (
+              <p className="text-sm text-[#A1A1AA] line-clamp-2 mb-4">
+                {account.description}
+              </p>
+            )}
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(45, 45, 58, 0.5)' }}>
