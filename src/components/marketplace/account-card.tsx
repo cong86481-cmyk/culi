@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Crown, Star, Eye, Clock, TrendingUp } from 'lucide-react'
+import { Crown, Star, Eye, Zap, Clock, TrendingUp } from 'lucide-react'
 import { formatPrice, formatRelativeTime } from '@/lib/utils'
 import type { Account } from '@/types'
 
